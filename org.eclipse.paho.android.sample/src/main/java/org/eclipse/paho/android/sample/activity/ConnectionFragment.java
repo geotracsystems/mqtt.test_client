@@ -1,5 +1,6 @@
 package org.eclipse.paho.android.sample.activity;
 
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
@@ -10,12 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+
 import org.eclipse.paho.android.sample.R;
 import org.eclipse.paho.android.sample.internal.Connections;
+
 import java.util.Map;
 
 
-public class ConnectionFragment extends Fragment {
+public class ConnectionFragment extends Fragment
+{
     private Connection connection;
     private FragmentTabHost mTabHost;
     private Switch connectSwitch;
@@ -49,7 +53,7 @@ public class ConnectionFragment extends Fragment {
 
         // Initialise the tab-host
         mTabHost = (FragmentTabHost) rootView.findViewById(android.R.id.tabhost);
-        mTabHost.setup(getActivity(), getChildFragmentManager(), android.R.id.tabcontent);
+        mTabHost.setup(getActivity(), getFragmentManager(), android.R.id.tabcontent);
         // Add a tab to the tabHost
         mTabHost.addTab(mTabHost.newTabSpec("History").setIndicator("History"), HistoryFragment.class, bundle);
         mTabHost.addTab(mTabHost.newTabSpec("Publish").setIndicator("Publish"), PublishFragment.class, bundle);

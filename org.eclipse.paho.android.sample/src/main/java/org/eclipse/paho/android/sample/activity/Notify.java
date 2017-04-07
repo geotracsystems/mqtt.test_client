@@ -17,7 +17,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat.Builder;
 import android.widget.Toast;
 
 import org.eclipse.paho.android.sample.R;
@@ -57,20 +56,19 @@ class Notify {
             0, intent, 0);
 
     //build the notification
-    Builder notificationCompat = new Builder(context);
-    notificationCompat.setAutoCancel(true)
-        .setContentTitle(contentTitle)
-        .setContentIntent(pendingIntent)
-        .setContentText(messageString)
-        .setTicker(ticker)
-        .setWhen(when)
-        .setSmallIcon(R.mipmap.ic_launcher);
-
-    Notification notification = notificationCompat.build();
-    //display the notification
-    mNotificationManager.notify(MessageID, notification);
-    MessageID++;
-
+      Notification.Builder notificationCompat = new Notification.Builder(context);
+      notificationCompat.setAutoCancel(true)
+              .setContentTitle(contentTitle)
+              .setContentIntent(pendingIntent)
+              .setContentText(messageString)
+              .setTicker(ticker)
+              .setWhen(when)
+              .setSmallIcon(R.mipmap.ic_launcher);
+      
+      Notification notification = notificationCompat.build();
+      //display the notification
+      mNotificationManager.notify(MessageID, notification);
+      MessageID++;
   }
 
   /**
