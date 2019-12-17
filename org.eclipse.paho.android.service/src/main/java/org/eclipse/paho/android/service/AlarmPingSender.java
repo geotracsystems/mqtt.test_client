@@ -28,7 +28,10 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 import android.util.Log;
+
+import java.util.Date;
 
 /**
  * Default ping sender implementation on Android. It is based on AlarmManager.
@@ -102,9 +105,10 @@ class AlarmPingSender implements MqttPingSender {
 
 	@Override
 	public void schedule(long delayInMilliseconds) {
-		long nextAlarmInMilliseconds = System.currentTimeMillis()
-				+ delayInMilliseconds/10;
-		Log.d(TAG, "Schedule next alarm at " + nextAlarmInMilliseconds);
+		long nextAlarmInMilliseconds = SystemClock.elapsedRealtime()
+				+ delayInMilliseconds;
+		Date nextSchedule = new Date(System.currentTimeMillis() + delayInMilliseconds);
+		Log.d(TAG, "Schedule next alarm at " + nextSchedule.toString());
 		AlarmManager alarmManager = (AlarmManager) service
 				.getSystemService(Service.ALARM_SERVICE);
 
@@ -116,10 +120,10 @@ class AlarmPingSender implements MqttPingSender {
 					pendingIntent);
 		} else if (Build.VERSION.SDK_INT >= 19) {
 			Log.d(TAG, "Alarm scheule using setExact, delay: " + delayInMilliseconds);
-			alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds,
+			alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextAlarmInMilliseconds,
 					pendingIntent);
 		} else {
-			alarmManager.set(AlarmManager.RTC_WAKEUP, nextAlarmInMilliseconds,
+			alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextAlarmInMilliseconds,
 					pendingIntent);
 		}
 	}
@@ -173,6 +177,7 @@ class AlarmPingSender implements MqttPingSender {
 
 
 			if (token == null && wakelock.isHeld()) {
+				Log.d(TAG,"The java client doesn't think it's necessary to do a ping yet");
 				wakelock.release();
 			}
 		}
