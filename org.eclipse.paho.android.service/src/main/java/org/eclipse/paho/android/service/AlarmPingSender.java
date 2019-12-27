@@ -12,11 +12,6 @@
  */
 package org.eclipse.paho.android.service;
 
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
-import org.eclipse.paho.client.mqttv3.MqttPingSender;
-import org.eclipse.paho.client.mqttv3.internal.ClientComms;
-
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -30,6 +25,11 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
 import android.util.Log;
+
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttPingSender;
+import org.eclipse.paho.client.mqttv3.internal.ClientComms;
 
 import java.util.Date;
 
@@ -105,18 +105,16 @@ class AlarmPingSender implements MqttPingSender {
 
 	@Override
 	public void schedule(long delayInMilliseconds) {
-		long nextAlarmInMilliseconds = SystemClock.elapsedRealtime()
-				+ delayInMilliseconds;
+		long nextAlarmInMilliseconds = SystemClock.elapsedRealtime() + delayInMilliseconds;
 		Date nextSchedule = new Date(System.currentTimeMillis() + delayInMilliseconds);
 		Log.d(TAG, "Schedule next alarm at " + nextSchedule.toString());
-		AlarmManager alarmManager = (AlarmManager) service
-				.getSystemService(Service.ALARM_SERVICE);
+		AlarmManager alarmManager = (AlarmManager) service.getSystemService(Service.ALARM_SERVICE);
 
         if(Build.VERSION.SDK_INT >= 23){
 			// In SDK 23 and above, dosing will prevent setExact, setExactAndAllowWhileIdle will force
 			// the device to run this task whilst dosing.
 			Log.d(TAG, "Alarm scheule using setExactAndAllowWhileIdle, next: " + delayInMilliseconds);
-			alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, delayInMilliseconds,
+			alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextAlarmInMilliseconds,
 					pendingIntent);
 		} else if (Build.VERSION.SDK_INT >= 19) {
 			Log.d(TAG, "Alarm scheule using setExact, delay: " + delayInMilliseconds);
@@ -145,7 +143,7 @@ class AlarmPingSender implements MqttPingSender {
 			// finished handling the broadcast.", but this class still get
 			// a wake lock to wait for ping finished.
 
-			Log.d(TAG, "Sending Ping at:" + System.currentTimeMillis());
+			Log.d(TAG, "Sending Ping at: " + System.currentTimeMillis());
 
 			PowerManager pm = (PowerManager) service
 					.getSystemService(Service.POWER_SERVICE);
@@ -175,10 +173,9 @@ class AlarmPingSender implements MqttPingSender {
 				}
 			});
 
-
-			if (token == null && wakelock.isHeld()) {
+			if (token == null) {
 				Log.d(TAG,"The java client doesn't think it's necessary to do a ping yet");
-				wakelock.release();
+				if (wakelock.isHeld()) wakelock.release();
 			}
 		}
 	}
