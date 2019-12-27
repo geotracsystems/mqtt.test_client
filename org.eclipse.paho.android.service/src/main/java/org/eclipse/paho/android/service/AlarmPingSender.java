@@ -142,8 +142,12 @@ class AlarmPingSender implements MqttPingSender {
 			// This guarantees that the phone will not sleep until you have
 			// finished handling the broadcast.", but this class still get
 			// a wake lock to wait for ping finished.
-
-			Log.d(TAG, "Sending Ping at: " + System.currentTimeMillis());
+			
+			long diff = intent.hasExtra("android.intent.extra.ALARM_TARGET_TIME") ?
+				SystemClock.elapsedRealtime() - intent.getExtras().getLong("android.intent.extra.ALARM_TARGET_TIME") :
+				-9999;
+			
+			Log.d(TAG, "Sending Ping at: " + System.currentTimeMillis() + ", " + diff + " ms later than target");
 
 			PowerManager pm = (PowerManager) service
 					.getSystemService(Service.POWER_SERVICE);
