@@ -23,7 +23,7 @@ ext{
     sampleVersion = '1.1.1'
 
     serviceArchivesBaseName = 'org.eclipse.paho.android.service'
-    serviceVersion = '1.1.1'
+    serviceVersion = '1.2.0-SNAPSHOT'
 
     clientVersion = '1.1.0'
 
