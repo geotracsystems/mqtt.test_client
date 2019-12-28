@@ -12,11 +12,12 @@
  */
 package org.eclipse.paho.android.service;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import android.app.Service;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 import org.eclipse.paho.android.service.MessageStore.StoredMessage;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -31,14 +32,14 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
+import org.eclipse.paho.client.mqttv3.MqttPingSender;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
-import android.app.Service;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.util.Log;
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * <p>
@@ -118,7 +119,7 @@ class MqttConnection implements MqttCallbackExtended {
 	// our client object - instantiated on connect
 	private MqttAsyncClient myClient = null;
 
-	private AlarmPingSender alarmPingSender = null;
+	private MqttPingSender pingSender = null;
 
 	// our (parent) service object
 	private MqttService service = null;
@@ -285,9 +286,9 @@ class MqttConnection implements MqttCallbackExtended {
 			
 			// if myClient is null, then create a new connection
 			else {
-				alarmPingSender = new AlarmPingSender(service);
+				pingSender = new HandlerPingSender(service);
 				myClient = new MqttAsyncClient(serverURI, clientId,
-						persistence, alarmPingSender);
+						persistence, pingSender);
 				myClient.setCallback(this);
 
 				service.traceDebug(TAG,"Do Real connect!");
@@ -825,7 +826,7 @@ class MqttConnection implements MqttCallbackExtended {
 			} else {
 				// Using the new Automatic reconnect functionality.
 				// We can't force a disconnection, but we can speed one up
-				alarmPingSender.schedule(100);
+				pingSender.schedule(100);
 
 			}
 		} catch (Exception e) {
