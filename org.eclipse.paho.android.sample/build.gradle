@@ -24,27 +24,14 @@ android {
     }
 }
 
-//repositories {
-//    maven { url rootProject.ext.mavenUrl }
-//}
-
-
-
 dependencies {
-    //compile fileTree(dir: '../org.eclipse.paho.android/service/libs', excludes: ["org.eclipse.paho.client.mqttv3-${rootProject.ext.clientVersion}.jar"], include: '')
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1"
     implementation (project(':org.eclipse.paho.android.service')){
-        //exclude module: "org.eclipse.paho.client.mqttv3"
         transitive=true
     }
 }
-
-//task publishAPK(type: Copy) {
-//    from file("${project.buildDir}/outputs/apk/" + rootProject.ext.sampleArchivesBaseName + "-debug.apk");
-//    into '/shared/technology/paho/Android/' + rootProject.ext.sampleVersion + '/debug/';
-//}
 
 
 //configurations.compile.exclude module: 'org.eclipse.paho.client.mqttv3'
