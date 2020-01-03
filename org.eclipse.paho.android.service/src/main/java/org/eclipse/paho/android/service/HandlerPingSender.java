@@ -2,6 +2,7 @@ package org.eclipse.paho.android.service;
 
 import android.app.Service;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.Log;
@@ -24,7 +25,7 @@ import java.util.Date;
  */
 class HandlerPingSender implements MqttPingSender, Runnable {
     // Identifier for Intents, log messages, etc..
-    private static final String TAG = "AlarmPingSender";
+    private static final String TAG = "HandlerPingSender";
     private final String wakeLockTag = MqttServiceConstants.PING_WAKELOCK + ":PingSender";
     // TODO: Add log.
     private ClientComms comms;
@@ -39,7 +40,9 @@ class HandlerPingSender implements MqttPingSender, Runnable {
                 "Neither service nor client can be null.");
         }
         this.service = service;
-        this.handler = new Handler();
+        HandlerThread handlerThread = new HandlerThread("PingSender");
+        handlerThread.start();
+        this.handler = new Handler(handlerThread.getLooper());
     }
     
     @Override
