@@ -13,6 +13,8 @@ buildscript {
     }
 }
 
+apply from: "https://www.github.com/geotracsystems/android-build-scripts/raw/1.3/lib_common.gradle"
+
 ext{
 
     compileSdkVersion = 24
@@ -23,7 +25,7 @@ ext{
     sampleVersion = '1.1.1'
 
     serviceArchivesBaseName = 'org.eclipse.paho.android.service'
-    serviceVersion = '1.2.0-SNAPSHOT'
+    serviceVersion = '1.2.0.1'
 
     clientVersion = '1.1.0'
 
@@ -58,6 +60,38 @@ allprojects {
     repositories {
         jcenter()
         google()
+        maven {
+            url "http://packages.geotracinternational.com/nexus/repository/maven-snapshots/"
+            credentials {
+                username = "${nexus_username}"
+                password = "${nexus_password}"
+            }
+        }
+        maven {
+            url "http://packages.geotracinternational.com/nexus/repository/maven-releases/"
+            credentials {
+                username = "${nexus_username}"
+                password = "${nexus_password}"
+            }
+        }
+    }
+
+    // Add this to reduce caching to avoid stale snapshots
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 60, 'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 1, 'hours'
+
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'com.geotracsystems') {
+                def definedInProject = rootProject.subprojects.any { project ->
+                    return details.requested.toString() == "${project.group}:${project.name}:${project.version}"
+                }
+
+                if (!definedInProject) {
+                    details.useVersion getDependencyVersion(details.requested.version)
+                }
+            }
+        }
     }
 
     version = rootProject.ext.serviceVersion
